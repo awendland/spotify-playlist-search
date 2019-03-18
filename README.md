@@ -19,3 +19,7 @@ This is an application built with [AppRun](https://github.com/yysun/apprun).
 ### Quick Thoughts
 
 This was shockingly easy to build. AppRun has a great approach that makes it super quick to hit the ground running. I'll probably using it for quickshot projects in the future :)
+
+### Screenshot
+
+![Screenshot of the web app with the search text "Sat" showing 3 matching playlists of 1504 total tracks in 41 playlists](readme/screenshot.jpg)
