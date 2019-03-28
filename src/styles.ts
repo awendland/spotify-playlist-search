@@ -23,6 +23,11 @@ export const GLOBAL = `
   }
 `
 
+export const refresh = css`
+  cursor: pointer;
+  text-decoration: underline;
+`
+
 export const input = css`
   width: 100%;
   border: none;

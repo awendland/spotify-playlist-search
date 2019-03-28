@@ -1,16 +1,14 @@
 const path = require('path')
 const webpack = require('webpack')
-
-// TODO allow these to be provided through env vars
-const SPOTIFY_KEYS = require('./spotify_keys.json')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: {
-    'dist/app': './src/main.tsx',
+    'app': './src/main.tsx',
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname),
+    path: path.resolve(__dirname, 'build'),
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -22,13 +20,19 @@ module.exports = {
     ],
   },
   plugins: [
-    new webpack.DefinePlugin({
-      SPOTIFY_CLIENT_ID: JSON.stringify(SPOTIFY_KEYS.client_id),
-      SPOTIFY_CLIENT_SECRET: JSON.stringify(SPOTIFY_KEYS.client_secret),
+    new HtmlWebpackPlugin({
+      template: 'public/index.html',
     }),
   ],
   devServer: {
     open: true,
+    contentBase: path.join(__dirname, 'public'),
+    proxy: {
+      '/.netlify': {
+        target: 'http://localhost:9000',
+        pathRewrite: { '^/.netlify/functions': '' },
+      },
+    },
   },
   devtool: 'source-map',
 }

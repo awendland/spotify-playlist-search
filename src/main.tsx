@@ -36,7 +36,7 @@ const view = state => {
       <style type="text/css">{styles.GLOBAL}</style>
       <h1>Spotify Playlist Search</h1>
       <p><em>{state.status}</em></p>
-      <p><a onclick={() => app.run('refresh')}>Refresh</a></p>
+      <p><a className={styles.refresh} onclick={() => app.run('refresh')}>Refresh</a></p>
       <input
         disabled={!state.allTracks}
         oninput={(ev) => app.run('filter', ev.target.value)}

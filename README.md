@@ -8,13 +8,13 @@ Caveat: at the moment this is hardcoded for my Spotify account, `awendland`.
 
 ### Dev
 
-NOTE: you must provide `client_id` and `client_secret` in a JSON file called `spotify_keys.json` in the repo root.
+NOTE: you must provide `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in the environment.
 
-* Use _npm start_ to start the dev server
-* Use _npm test_ to run unit tests
-* Use _npm run build_ to build for production
+* Use _yarn start_ to start the dev server (both client and FaaS)
+* Use _yarn test_ to run unit tests
+* Use _yarn build_ to build for production
 
-This is an application built with [AppRun](https://github.com/yysun/apprun).
+This is an application built with [AppRun](https://github.com/yysun/apprun) and using [Netlify functions](https://www.netlify.com/docs/functions/).
 
 ### Quick Thoughts
 

@@ -4,4 +4,6 @@ Thumbs.db
 node_modules
 coverage
 .cache
-spotify_keys.json
+/build
+/lambda
+*.env
