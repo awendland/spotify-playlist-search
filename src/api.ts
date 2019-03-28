@@ -7,6 +7,9 @@ app.on('get-playlists', async (state) => {
 
   const {playlists, tracks} = await fetch(`/.netlify/functions/get-playlists`).then(r => r.json())
 
+  state.status = 'Parsing track info...'
+  app.run('render')
+
   state.playlists = playlists.items
   state.allTracks = tracks.reduce((allTracks: [], tracksJson: any, i) => {
     const playlist = playlists.items[i]
