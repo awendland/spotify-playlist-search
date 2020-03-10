@@ -25,14 +25,7 @@ module.exports = {
     }),
   ],
   devServer: {
-    open: true,
     contentBase: path.join(__dirname, 'public'),
-    proxy: {
-      '/.netlify': {
-        target: 'http://localhost:9000',
-        pathRewrite: { '^/.netlify/functions': '' },
-      },
-    },
   },
   devtool: 'source-map',
 }

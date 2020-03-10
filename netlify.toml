@@ -2,3 +2,8 @@
   command = "yarn build"
   functions = "lambda"
   publish = "build"
+
+[dev]
+  command = "yarn start:app"
+  targetPort = 8080
+  publish = "build"

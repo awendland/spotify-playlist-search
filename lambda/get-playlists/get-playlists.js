@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+const fetch = require('node-fetch')
 
 const searchParams = params => Object.keys(params).map((key) =>
   encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
@@ -12,7 +12,7 @@ const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET} = process.env
     console.error(`!!! Missing ${secretKey} in env: unable to communicate with Spotify API !!!`)
 })
 
-export async function handler(event, context) {
+exports.handler = async function(event, context) {
   try {
     // 1. Retrieve API token from Spotify (if not already cached)
     if (!cachedAccessToken) {
