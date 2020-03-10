@@ -7,6 +7,10 @@ const searchParams = params => Object.keys(params).map((key) =>
 let cachedAccessToken = null
 
 const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET} = process.env
+;(['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET']).forEach(secretKey => {
+  if (!process.env[secretKey])
+    console.error(`!!! Missing ${secretKey} in env: unable to communicate with Spotify API !!!`)
+})
 
 export async function handler(event, context) {
   try {
