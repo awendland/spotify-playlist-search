@@ -7,15 +7,21 @@ const state = {}
 const view = state => {
   let bodyView
   if (state.allTracks) {
+    const hasEveryKeyword = (() => {
+      const keywords = state.filter?.split(/\s+/)
+      return (searchStr) => keywords.every(keyword => searchStr.includes(keyword))
+    })()
     const filteredTracks = state.filter && state.filter != ''
-      ? state.allTracks.filter(t => t.name.toLowerCase().indexOf(state.filter) != -1)
+      ? state.allTracks.filter(t => hasEveryKeyword(t._searchStr))
       : state.allTracks
     bodyView = (
       <ul className={styles.list}>
         {filteredTracks.map(p => (
           <li className={styles.listItem}>
-            {p.name}<br/>
-            <small>{p.playlist}</small>
+            {p.spotifyUrl
+              ? <a href={p.spotifyUrl}>{p.name}</a>
+              : p.name} <br/>
+            <small>{p.artists?.[0] && `${p.artists[0]} — `}{p.playlist}</small>
           </li>
         ))}
       </ul>

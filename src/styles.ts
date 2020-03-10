@@ -21,6 +21,9 @@ export const GLOBAL = `
     max-width: 800px;
     text-align: center;
   }
+  a {
+    color: inherit;
+  }
 `
 
 export const refresh = css`

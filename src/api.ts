@@ -15,7 +15,10 @@ app.on('get-playlists', async (state) => {
     const playlist = playlists.items[i]
     return allTracks.concat(tracksJson.items.map(({track}) => ({
       name: track.name,
+      spotifyUrl: track.external_urls?.spotify,
+      artists: track.artists.map(a => a.name),
       playlist: playlist.name,
+      _searchStr: `${track.name} ${track.artists.map(a => a.name).join(' ')} ${playlist.name}`.toLowerCase(),
     })))
   }, [])
   state.status = `Found ${state.allTracks.length} total tracks in ${state.playlists.length} playlists`
