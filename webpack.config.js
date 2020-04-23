@@ -1,6 +1,6 @@
 const path = require('path')
-const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 const { GenerateSW } = require('workbox-webpack-plugin')
 
 module.exports = {
@@ -25,6 +25,9 @@ module.exports = {
       template: 'public/index.html',
     }),
     new GenerateSW(),
+    new CopyPlugin([
+      { from: 'public/favicons-for-root' },
+    ]),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'public'),
