@@ -1,6 +1,6 @@
 ## Spotify Playlist Search
 
-* **Contxt**: I make quarterly playlists on Spotify, and I don't like to repeat music from previous playlists
+* **Context**: I make quarterly playlists on Spotify, and I don't like to repeat music from previous playlists
 * **Problem**: Spotify makes it hard to search your playlists (you have to search each one)
 * **Solution**: This small web-app retrieves all your playlists and let's you search the track names
 

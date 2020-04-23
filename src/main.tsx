@@ -1,3 +1,4 @@
+import './register-sw'
 import app from 'apprun'
 import './api'
 import * as styles from './styles'
