@@ -1,31 +1,5 @@
 import { css } from 'emotion'
 
-export const GLOBAL = `
-  html, body {
-    font-family: sans-serif;
-    background: #251533;
-    box-sizing: border-box;
-  }
-  *, *::before, *::after {
-    box-sizing: inherit;
-  }
-  body {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #C5AEDA;
-  }
-  #my-app {
-    width: 95%;
-    max-width: 800px;
-    text-align: center;
-  }
-  a {
-    color: inherit;
-  }
-`
-
 export const refresh = css`
   cursor: pointer;
   text-decoration: underline;

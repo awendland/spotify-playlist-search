@@ -40,7 +40,6 @@ const view = state => {
 
   return (
     <div>
-      <style type="text/css">{styles.GLOBAL}</style>
       <h1>Spotify Playlist Search</h1>
       <p><em>{state.status}</em></p>
       <p><a className={styles.refresh} onclick={() => app.run('refresh')}>Refresh</a></p>

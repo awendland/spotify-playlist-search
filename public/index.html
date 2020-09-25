@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Alex's Spotify Playlist Search</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Favicon:Start -->
@@ -15,6 +15,31 @@
   <meta name="msapplication-TileColor" content="#251533">
   <meta name="theme-color" content="#ffffff">
   <!-- Favicon:End -->
+  <style type="text/css">
+  html, body {
+    font-family: sans-serif;
+    background: #251533;
+    box-sizing: border-box;
+  }
+  *, *::before, *::after {
+    box-sizing: inherit;
+  }
+  body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #C5AEDA;
+  }
+  #my-app {
+    width: 95%;
+    max-width: 800px;
+    text-align: center;
+  }
+  a {
+    color: inherit;
+  }
+  </style>
 </head>
 <body>
   <div id="my-app"></div>
