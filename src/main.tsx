@@ -53,6 +53,7 @@ const view = (state: State) => {
         </a>
       </p>
       <input
+        type="search"
         disabled={!state.allTracks}
         oninput={(ev) => app.run('filter', ev.target.value)}
         placeholder="Search tracks"
