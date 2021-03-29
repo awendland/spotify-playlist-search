@@ -5,11 +5,11 @@ const { GenerateSW } = require('workbox-webpack-plugin')
 
 module.exports = {
   entry: {
-    'app': './src/main.tsx',
+    app: './src/app/main.tsx',
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'build/app'),
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -17,7 +17,7 @@ module.exports = {
   module: {
     rules: [
       { test: /.tsx?$/, loader: 'ts-loader' },
-      { test: /\.js$/, use: ["source-map-loader"], enforce: "pre" },
+      { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
     ],
   },
   plugins: [
@@ -25,9 +25,7 @@ module.exports = {
       template: 'public/index.html',
     }),
     new GenerateSW(),
-    new CopyPlugin([
-      { from: 'public/favicons-for-root' },
-    ]),
+    new CopyPlugin([{ from: 'public/favicons-for-root' }]),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'public'),

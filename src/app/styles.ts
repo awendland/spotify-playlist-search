@@ -9,17 +9,17 @@ export const input = css`
   width: 100%;
   border: none;
   background: none;
-  border: 2px solid #D42867;
+  border: 2px solid #d42867;
   font-size: 2em;
   text-align: center;
   padding: 0.5em 1em;
   margin: 0.5em 0;
   outline: none;
-  color: #D42867;
+  color: #d42867;
   opacity: 0.4;
   transition: 0.2s opacity;
-  &::placeholder{
-    color: #D42867;
+  &::placeholder {
+    color: #d42867;
   }
   &:focus {
     opacity: 1;

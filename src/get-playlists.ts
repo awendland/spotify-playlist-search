@@ -1,13 +1,14 @@
-const fetch = require('node-fetch')
+import fetch from 'node-fetch'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 
-const searchParams = (params) =>
+const searchParams = (params: Record<string, string>) =>
   Object.keys(params)
     .map(
       (key) => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
     )
     .join('&')
 
-let cachedAccessToken = null
+let cachedAccessToken: string | null = null
 
 const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env
 ;['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET'].forEach((secretKey) => {
@@ -17,7 +18,10 @@ const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env
     )
 })
 
-exports.handler = async function (event, context) {
+export const handler = async function (
+  event: APIGatewayProxyEvent,
+  context: any
+) {
   try {
     // 1. Retrieve API token from Spotify (if not already cached)
     if (!cachedAccessToken) {
@@ -54,8 +58,8 @@ exports.handler = async function (event, context) {
     console.log(`Found ${playlistsJson.items.length} playlists`)
 
     // 3. Retrieve track details for each playlist
-    const pTracksJson = await Promise.all(
-      playlistsJson.items.map((playlist) =>
+    const tracksJson = await Promise.all(
+      playlistsJson.items.map((playlist: any) =>
         // TODO there is no error handling with any of these requests
         fetch(playlist.tracks.href, {
           method: 'GET',
@@ -74,7 +78,7 @@ exports.handler = async function (event, context) {
       },
       body: JSON.stringify({
         playlists: playlistsJson,
-        tracks: pTracksJson,
+        tracks: tracksJson,
       }),
     }
   } catch (err) {

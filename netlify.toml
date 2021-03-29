@@ -1,9 +1,9 @@
 [build]
   command = "yarn build"
-  functions = "lambda"
-  publish = "build"
+  functions = "build/functions/"
+  publish = "build/app/"
 
 [dev]
-  command = "yarn start:app"
+  command = "yarn run-p start:**"
   targetPort = 8080
-  publish = "build"
+  publish = "build/app/"

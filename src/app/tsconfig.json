@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "reactNamespace": "app",
+    "lib": ["dom", "es2015", "es5"],
+    "sourceMap": true,
+    "noImplicitAny": false // needed because of https://github.com/yysun/apprun/issues/70
+  }
+}

@@ -5,7 +5,7 @@ import {
   SpotifyPlaylist,
   SpotifyPaginatedResponse,
   SpotifyTrack,
-} from './types'
+} from '../common/types'
 
 const zip = function* <A, B>(arrA: Array<A>, arrB: Array<B>) {
   for (let i = 0; i < arrA.length && i < arrB.length; ++i) {

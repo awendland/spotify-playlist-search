@@ -1,5 +1,5 @@
 import { Infer } from 'superstruct'
-import { SpotifyPlaylist, SpotifyTrack } from './types'
+import { SpotifyPlaylist } from '../common/types'
 
 export interface Track {
   name: string
