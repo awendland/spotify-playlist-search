@@ -3,7 +3,7 @@ import * as S from 'superstruct'
 export const SpotifyPaginatedResponse = <T extends S.Struct<any>>(
   itemType: T
 ) =>
-  S.type({
+  S.object({
     href: S.string(),
     items: S.array(itemType),
     limit: S.number(),
@@ -13,13 +13,17 @@ export const SpotifyPaginatedResponse = <T extends S.Struct<any>>(
     total: S.number(),
   })
 
-export const SpotifyPlaylist = S.type({
+export const SpotifyPlaylist = S.object({
   external_urls: S.nullable(
-    S.type({
+    S.object({
       spotify: S.nullable(S.string()),
     })
   ),
   name: S.string(),
+  tracks: S.object({
+    href: S.string(),
+    total: S.number(),
+  }),
   // The following properties are unused and therefore disabled to reduce
   // the chance of an error that we don't care about being thrown.
   //
@@ -27,14 +31,14 @@ export const SpotifyPlaylist = S.type({
   // description: S.string(),
   // href: S.string(),
   // id: S.string(),
-  // images: S.array(S.type({
+  // images: S.array(S.object({
   //   height: S.number(),
   //   url: S.string(),
   //   width: S.number(),
   // })),
-  // owner: S.type({
+  // owner: S.object({
   //   display_name: S.string(),
-  //   external_urls: S.type({
+  //   external_urls: S.object({
   //     spotify: S.optional(S.string()),
   //   }),
   //   href: S.string(),
@@ -45,20 +49,16 @@ export const SpotifyPlaylist = S.type({
   // primary_color: S.nullable(S.string()),
   // public: S.boolean(),
   // snapshot_id: S.string(),
-  // tracks: S.type({
-  //   href: S.string(),
-  //   total: S.number(),
-  // }),
   // type: S.string(),
   // uri: S.string(),
 })
 
-export const SpotifyTrack = S.type({
+export const SpotifyTrack = S.object({
   added_at: S.string(),
-  track: S.type({
+  track: S.object({
     artists: S.array(
-      S.type({
-        external_urls: S.type({ spotify: S.optional(S.string()) }),
+      S.object({
+        external_urls: S.object({ spotify: S.optional(S.string()) }),
         name: S.string(),
         // The following properties are unused and therefore disabled to reduce
         // the chance of an error that we don't care about being thrown.
@@ -69,18 +69,18 @@ export const SpotifyTrack = S.type({
         // uri: S.string(),
       })
     ),
-    external_urls: S.type({ spotify: S.optional(S.string()) }),
+    external_urls: S.object({ spotify: S.optional(S.string()) }),
     name: S.string(),
     // The following properties are unused and therefore disabled to reduce
     // the chance of an error that we don't care about being thrown.
     //
-    // album: S.type(),
+    // album: S.object(),
     // available_markets: S.array(string()),
     // disc_number: S.number(),
     // duration_ms: S.number(),
     // episode: S.boolean(),
     // explicit: S.boolean(),
-    // external_ids: S.type({ isrc: S.nullable(S.string()) }),
+    // external_ids: S.object({ isrc: S.nullable(S.string()) }),
     // href: S.string(),
     // id: S.string(),
     // is_local: S.boolean(),
@@ -94,8 +94,8 @@ export const SpotifyTrack = S.type({
   // The following properties are unused and therefore disabled to reduce
   // the chance of an error that we don't care about being thrown.
   //
-  // added_by: S.type(),
+  // added_by: S.object(),
   // is_local: S.boolean(),
   // primary_color: S.nullable(S.string()),
-  // video_thumbnail: S.type(),
+  // video_thumbnail: S.object(),
 })

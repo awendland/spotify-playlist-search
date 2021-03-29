@@ -9141,10 +9141,10 @@ strip-outer@^1.0.0:
   dependencies:
     escape-string-regexp "^1.0.2"
 
-superstruct@^0.12.1:
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.12.1.tgz#04293026f3d4a57a4c409efb3c01b353bed1f492"
-  integrity sha512-DLb5DmTKv9scfaBiGY9bPZbRZ0x4Ic8lD/qEXPOrsTnQrpRHGEZ77HbgvZOlj6wWW3LH7X8F4siMjR5SFEngiQ==
+superstruct@^0.15.0:
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.15.1.tgz#8a8c5175941debe08baa2abd6541784e46870333"
+  integrity sha512-amjQaSpO94o3DTcNgeuYhGYGbji6JLLnySbxyolXO+WtV+bwwK1IzKAet/jYcpltGg2nnX8CBnHpueYNyx2Cgw==
 
 supports-color@6.1.0, supports-color@^6.1.0:
   version "6.1.0"

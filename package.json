@@ -37,7 +37,7 @@
     "apprun": "^2.23.1",
     "emotion": "^10.0.9",
     "node-fetch": "^2.3.0",
-    "superstruct": "^0.12.1"
+    "superstruct": "^0.15.0"
   },
   "jest": {
     "transform": {

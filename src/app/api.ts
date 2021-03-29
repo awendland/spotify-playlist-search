@@ -21,10 +21,14 @@ app.on('get-playlists', async (state: State) => {
     const jsonResp = await fetch(
       `/.netlify/functions/get-playlists`
     ).then((r) => r.json())
-    const playlistResp = jsonResp.playlists
-    S.assert(playlistResp, SpotifyPaginatedResponse(SpotifyPlaylist))
-    const concatTracksResp = jsonResp.tracks
-    S.assert(concatTracksResp, S.array(SpotifyPaginatedResponse(SpotifyTrack)))
+    const playlistResp = S.mask(
+      jsonResp.playlists,
+      SpotifyPaginatedResponse(SpotifyPlaylist)
+    )
+    const concatTracksResp = S.mask(
+      jsonResp.tracks,
+      S.array(SpotifyPaginatedResponse(SpotifyTrack))
+    )
 
     state.status = 'Parsing track info...'
     app.run('render')

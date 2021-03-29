@@ -1,5 +1,11 @@
 import fetch from 'node-fetch'
 import { APIGatewayProxyEvent } from 'aws-lambda'
+import * as S from 'superstruct'
+import {
+  SpotifyPaginatedResponse,
+  SpotifyPlaylist,
+  SpotifyTrack,
+} from './common/types'
 
 const searchParams = (params: Record<string, string>) =>
   Object.keys(params)
@@ -55,18 +61,27 @@ export const handler = async function (
         },
       }
     ).then((r) => r.json())
+    const playlists = S.mask(
+      // Mask these values to reduce the payload size
+      playlistsJson,
+      SpotifyPaginatedResponse(SpotifyPlaylist)
+    )
     console.log(`Found ${playlistsJson.items.length} playlists`)
 
     // 3. Retrieve track details for each playlist
-    const tracksJson = await Promise.all(
-      playlistsJson.items.map((playlist: any) =>
+    const tracks = await Promise.all(
+      playlists.items.map((playlist) =>
         // TODO there is no error handling with any of these requests
         fetch(playlist.tracks.href, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${cachedAccessToken}`,
           },
-        }).then((r) => r.json())
+        })
+          .then((r) => r.json())
+          .then((trackJson) =>
+            S.mask(trackJson, SpotifyPaginatedResponse(SpotifyTrack))
+          )
       )
     )
     console.log(`Pulled track data for ${playlistsJson.items.length} playlists`)
@@ -77,8 +92,8 @@ export const handler = async function (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        playlists: playlistsJson,
-        tracks: tracksJson,
+        playlists,
+        tracks,
       }),
     }
   } catch (err) {
