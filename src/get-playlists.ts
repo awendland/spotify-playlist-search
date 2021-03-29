@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+import fetch, { RequestInit } from 'node-fetch'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import * as S from 'superstruct'
 import {
@@ -51,22 +51,55 @@ export const handler = async function (
 
     // 2. Retrieve all playlists for $SPOTIFY_USER
     const SPOTIFY_USER = `alexrwendland`
+    async function accumulatePaginatedResource(
+      pageableUrl: string,
+      requestOptions: RequestInit,
+      limit = 50
+    ) {
+      let acc = {
+        items: [],
+        offset: 0,
+        limit: 0,
+        total: Number.POSITIVE_INFINITY,
+        href: 'SYNTHESIZED',
+        next: null,
+        previous: null,
+      }
+      while (acc.items.length < acc.total) {
+        const newPage = await fetch(
+          pageableUrl +
+            (pageableUrl.includes('?') ? '' : '?') +
+            `limit=${limit}&offset=${acc.limit}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${cachedAccessToken}`,
+            },
+          }
+        ).then((r) => r.json())
+        acc.items = acc.items.concat(newPage.items)
+        acc.total = newPage.total
+        acc.limit += newPage.items.length
+      }
+      return acc
+    }
     // TODO this will only get the last 50 playlists (would need to call multiple times to get all)
-    const playlistsJson = await fetch(
-      `https://api.spotify.com/v1/users/${SPOTIFY_USER}/playlists?limit=50`,
+    const playlistsJson = await accumulatePaginatedResource(
+      `https://api.spotify.com/v1/users/${SPOTIFY_USER}/playlists`,
       {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${cachedAccessToken}`,
         },
-      }
-    ).then((r) => r.json())
+      },
+      50
+    )
     const playlists = S.mask(
       // Mask these values to reduce the payload size
       playlistsJson,
       SpotifyPaginatedResponse(SpotifyPlaylist)
     )
-    console.log(`Found ${playlistsJson.items.length} playlists`)
+    console.log(`Found ${playlists.items.length} playlists`)
 
     // 3. Retrieve track details for each playlist
     const tracks = await Promise.all(
