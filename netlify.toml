@@ -7,3 +7,4 @@
   command = "yarn run-p start:**"
   targetPort = 8080
   publish = "build/app/"
+  framework = "#custom"
