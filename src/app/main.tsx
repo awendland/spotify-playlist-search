@@ -41,6 +41,8 @@ const view = (state: State) => {
     )
   } else bodyView = ''
 
+  let inputEl: HTMLInputElement | null = null
+
   return (
     <div>
       <h1>Spotify Playlist Search</h1>
@@ -52,13 +54,28 @@ const view = (state: State) => {
           Refresh
         </a>
       </p>
-      <input
-        type="search"
-        disabled={!state.allTracks}
-        oninput={(ev) => app.run('filter', ev.target.value)}
-        placeholder="Search tracks"
-        className={styles.input}
-      />
+      <div className={styles.inputForm}>
+        <input
+          disabled={!state.allTracks}
+          oninput={(ev) => app.run('filter', ev.target.value)}
+          placeholder="Search tracks"
+          className={styles.input}
+          ref={(el: HTMLInputElement) => {
+            inputEl = el
+          }}
+        />
+        <button
+          className={styles.clearInput}
+          onclick={() => {
+            if (inputEl != null) {
+              inputEl.value = ''
+              app.run('filter', '')
+            }
+          }}
+        >
+          &times;
+        </button>
+      </div>
       {bodyView}
     </div>
   )
