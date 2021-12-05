@@ -70,6 +70,7 @@ const view = (state: State) => {
             if (inputEl != null) {
               inputEl.value = ''
               app.run('filter', '')
+              inputEl.focus()
             }
           }}
         >
