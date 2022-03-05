@@ -13,14 +13,17 @@ const zip = function* <A, B>(arrA: Array<A>, arrB: Array<B>) {
   }
 }
 
+export const normalizeSearchString = (str: string) =>
+  str.toLowerCase().replace(/[^a-z0-9]/, '')
+
 app.on('get-playlists', async (state: State) => {
   try {
     state.status = 'Fetching playlist info...'
     app.run('render')
 
-    const jsonResp = await fetch(
-      `/.netlify/functions/get-playlists`
-    ).then((r) => r.json())
+    const jsonResp = await fetch(`/.netlify/functions/get-playlists`).then(
+      (r) => r.json()
+    )
     const playlistResp = S.mask(
       jsonResp.playlists,
       SpotifyPaginatedResponse(SpotifyPlaylist)
@@ -46,13 +49,13 @@ app.on('get-playlists', async (state: State) => {
               spotifyUrl: track.external_urls?.spotify,
               artists: track.artists.map((a) => a.name),
               playlist: playlist.name,
-              _searchStr: [
-                track.name,
-                playlist.name,
-                ...track.artists.map((a) => a.name),
-              ]
-                .join(' ')
-                .toLowerCase(),
+              _searchStr: normalizeSearchString(
+                [
+                  track.name,
+                  playlist.name,
+                  ...track.artists.map((a) => a.name),
+                ].join(' ')
+              ),
             }))
         ),
       [] as Array<Track>

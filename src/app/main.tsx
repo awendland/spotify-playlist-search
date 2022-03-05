@@ -1,6 +1,6 @@
 import './register-sw'
 import app from 'apprun'
-import './api'
+import { normalizeSearchString } from './api'
 import * as styles from './styles'
 import { State } from './state'
 
@@ -92,7 +92,7 @@ const update: Record<string, (state: State, ...args: any[]) => State | void> = {
     app.run('get-playlists', state)
   },
   filter: (state: State, filter: string) => {
-    return { ...state, filter: filter.toLowerCase() }
+    return { ...state, filter: normalizeSearchString(filter) }
   },
   render: (state: State) => state,
 }
