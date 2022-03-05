@@ -26,6 +26,7 @@ const view = (state: State) => {
             <small>
               {p.artists?.[0] && `${p.artists[0]} — `}
               {p.playlist}
+              {p.isDuplicate ? '*' : ''}
             </small>
           </li>
         ))}

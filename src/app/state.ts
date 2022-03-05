@@ -9,8 +9,12 @@ export interface Track {
   _searchStr: string
 }
 
+export interface DuplicateTagged {
+  isDuplicate: boolean
+}
+
 export interface State {
-  allTracks?: Array<Track>
+  allTracks?: Array<Track & DuplicateTagged>
   playlists?: Array<Infer<typeof SpotifyPlaylist>>
   status?: string
   filter?: string

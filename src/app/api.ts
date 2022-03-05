@@ -37,7 +37,7 @@ app.on('get-playlists', async (state: State) => {
     app.run('render')
 
     state.playlists = playlistResp.items
-    state.allTracks = Array.from(
+    const allTracks = Array.from(
       zip(playlistResp.items, concatTracksResp)
     ).reduce(
       (allTracks, [playlist, { items: tracks }]) =>
@@ -60,6 +60,17 @@ app.on('get-playlists', async (state: State) => {
         ),
       [] as Array<Track>
     )
+    const countEachSpotifyUrl = allTracks
+      .filter((t) => !!t.spotifyUrl)
+      .reduce(
+        (map, t) => map.set(t.spotifyUrl, (map.get(t.spotifyUrl) ?? 0) + 1),
+        new Map()
+      )
+
+    state.allTracks = allTracks.map((t) => ({
+      ...t,
+      isDuplicate: (countEachSpotifyUrl.get(t.spotifyUrl) ?? 0) > 1,
+    }))
 
     state.status = `Found ${state.allTracks.length} total tracks in ${state.playlists.length} playlists`
     app.run('render')
