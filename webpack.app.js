@@ -17,10 +17,10 @@ module.exports = {
   module: {
     rules: [
       { test: /.tsx?$/, loader: 'ts-loader' },
-      { test: /\.js$/, use: ['source-map-loader'], enforce: 'pre' },
     ],
   },
   plugins: [
+    new CopyPlugin({ patterns: [{ from: 'public/favicons-for-root' }] }),
     new HtmlWebpackPlugin({
       template: 'public/index.html',
     }),
@@ -30,10 +30,9 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: true,
     }),
-    new CopyPlugin({ patterns: [{ from: 'public/favicons-for-root' }] }),
   ],
   devServer: {
     static: { directory: path.join(__dirname, 'public') },
   },
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
 }
