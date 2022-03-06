@@ -25,10 +25,10 @@ module.exports = {
       template: 'public/index.html',
     }),
     new GenerateSW(),
-    new CopyPlugin([{ from: 'public/favicons-for-root' }]),
+    new CopyPlugin({ patterns: [{ from: 'public/favicons-for-root' }] }),
   ],
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
+    static: { directory: path.join(__dirname, 'public') },
   },
   devtool: 'source-map',
 }
