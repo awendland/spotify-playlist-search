@@ -14,7 +14,7 @@ const zip = function* <A, B>(arrA: Array<A>, arrB: Array<B>) {
 }
 
 export const normalizeSearchString = (str: string) =>
-  str.toLowerCase().replace(/[^a-z0-9]/, '')
+  str.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 app.on('get-playlists', async (state: State) => {
   try {
