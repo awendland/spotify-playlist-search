@@ -19,7 +19,12 @@ module.exports = {
     ],
   },
   plugins: [
-    new CopyPlugin({ patterns: [{ from: 'public/favicons-for-root' }] }),
+    new CopyPlugin({
+      patterns: [
+        { from: 'public/favicons-for-root' },
+        { from: 'public/service-worker.js' },
+      ]
+    }),
     new HtmlWebpackPlugin({
       template: 'public/index.html',
     }),
