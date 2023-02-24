@@ -85,9 +85,9 @@ const view = (state: State) => {
 
 const update: Record<string, (state: State, ...args: any[]) => State | void> = {
   '#': (state) => {
+    app.run('get-playlists', state)
     const cachedState = JSON.parse(localStorage.getItem('cached') ?? 'null')
     if (cachedState) return { ...cachedState, ...state }
-    app.run('get-playlists', state)
   },
   refresh: (state: State) => {
     app.run('get-playlists', state)
