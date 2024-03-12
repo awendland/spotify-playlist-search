@@ -95,7 +95,7 @@ const update: Record<string, (state: State, ...args: any[]) => State | void> = {
   filter: (state: State, filter: string) => {
     return { ...state, filter: normalizeSearchString(filter) }
   },
-  render: (state: State) => state,
+  render: (state: State, newState: State) => newState,
 }
 
 app.start('my-app', state, view, update)

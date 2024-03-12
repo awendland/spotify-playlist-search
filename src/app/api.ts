@@ -19,7 +19,7 @@ export const normalizeSearchString = (str: string) =>
 app.on('get-playlists', async (state: State) => {
   try {
     state.status = 'Fetching playlist info...'
-    app.run('render')
+    app.run('render', state)
 
     const jsonResp = await fetch(`/.netlify/functions/get-playlists`).then(
       (r) => r.json()
@@ -34,7 +34,7 @@ app.on('get-playlists', async (state: State) => {
     )
 
     state.status = 'Parsing track info...'
-    app.run('render')
+    app.run('render', state)
 
     state.playlists = playlistResp.items
     const allTracks = Array.from(
@@ -73,7 +73,7 @@ app.on('get-playlists', async (state: State) => {
     }))
 
     state.status = `Found ${state.allTracks.length} total tracks in ${state.playlists.length} playlists`
-    app.run('render')
+    app.run('render', state)
 
     // Cache web requests so they don't need to be made on each page load
     localStorage.setItem(
@@ -90,6 +90,6 @@ app.on('get-playlists', async (state: State) => {
         ? e.message.replace(/\.?$/, '.') // ensure it ends with a period
         : 'An error occurred.'
     state.status = `${errorMessage} Try refreshing?`
-    app.run('render')
+    app.run('render', state)
   }
 })
