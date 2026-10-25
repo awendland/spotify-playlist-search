@@ -20,6 +20,9 @@ export const SpotifyPlaylist = S.object({
     })
   ),
   name: S.string(),
+  owner: S.object({
+    id: S.string(),
+  }),
   tracks: S.object({
     href: S.string(),
     total: S.number(),
@@ -36,16 +39,6 @@ export const SpotifyPlaylist = S.object({
   //   url: S.string(),
   //   width: S.number(),
   // })),
-  // owner: S.object({
-  //   display_name: S.string(),
-  //   external_urls: S.object({
-  //     spotify: S.optional(S.string()),
-  //   }),
-  //   href: S.string(),
-  //   id: S.string(),
-  //   type: S.string(),
-  //   uri: S.string(),
-  // }),
   // primary_color: S.nullable(S.string()),
   // public: S.boolean(),
   // snapshot_id: S.string(),
