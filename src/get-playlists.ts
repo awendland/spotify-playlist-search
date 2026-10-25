@@ -62,13 +62,22 @@ async function getAccessToken() {
   return access_token as string
 }
 
-async function spotifyGet(url: string) {
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+async function spotifyGet(url: string, retries = 3): Promise<any> {
   const resp = await fetch(url, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${await getAccessToken()}`,
     },
   })
+  // Development-mode apps have a low rate limit, so back off when asked to
+  // (as long as the wait fits within the function's execution time limit)
+  const retryAfter = Number(resp.headers.get('Retry-After') ?? 1)
+  if (resp.status === 429 && retries > 0 && retryAfter <= 3) {
+    await sleep(retryAfter * 1000)
+    return spotifyGet(url, retries - 1)
+  }
   if (!resp.ok) {
     throw new Error(`GET ${url} failed: ${resp.status} ${await resp.text()}`)
   }
@@ -97,6 +106,25 @@ async function accumulatePaginatedResource(firstPageUrl: string) {
   return acc
 }
 
+// Like Promise.all(items.map(fn)), but with at most `concurrency` in flight
+async function mapWithConcurrency<T, R>(
+  items: Array<T>,
+  concurrency: number,
+  fn: (item: T) => Promise<R>
+) {
+  const results: Array<R> = new Array(items.length)
+  let nextIndex = 0
+  await Promise.all(
+    Array.from({ length: concurrency }, async () => {
+      while (nextIndex < items.length) {
+        const i = nextIndex++
+        results[i] = await fn(items[i])
+      }
+    })
+  )
+  return results
+}
+
 export const handler = async function (
   event: APIGatewayProxyEvent,
   context: any
@@ -120,8 +148,10 @@ export const handler = async function (
     console.log(`Found ${playlists.items.length} playlists`)
 
     // 2. Retrieve every track for each playlist
-    const tracks = await Promise.all(
-      playlists.items.map(async (playlist) => {
+    const tracks = await mapWithConcurrency(
+      playlists.items,
+      10,
+      async (playlist) => {
         const trackJson = await accumulatePaginatedResource(
           playlist.tracks.href +
             (playlist.tracks.href.includes('?') ? '&' : '?') +
@@ -130,7 +160,7 @@ export const handler = async function (
         // Tracks that were removed from Spotify come back as `null`
         trackJson.items = trackJson.items.filter((item) => item?.track)
         return S.mask(trackJson, SpotifyPaginatedResponse(SpotifyTrack))
-      })
+      }
     )
     console.log(`Pulled track data for ${playlists.items.length} playlists`)
 
@@ -138,6 +168,9 @@ export const handler = async function (
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
+        // Cache on Netlify's CDN so repeat page loads don't hit Spotify's rate limit
+        'Netlify-CDN-Cache-Control':
+          'public, s-maxage=300, stale-while-revalidate=3600',
       },
       body: JSON.stringify({
         playlists,
