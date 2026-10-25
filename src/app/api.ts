@@ -21,9 +21,16 @@ app.on('get-playlists', async (state: State) => {
     state.status = 'Fetching playlist info...'
     app.run('render', state)
 
-    const jsonResp = await fetch(`/.netlify/functions/get-playlists`).then(
-      (r) => r.json()
-    )
+    const resp = await fetch(`/.netlify/functions/get-playlists`)
+    if (resp.status === 401) {
+      state.needsReconnect = true
+      state.status = 'The Spotify connection has expired.'
+      app.run('render', state)
+      return
+    }
+    const jsonResp = await resp.json()
+    state.needsReconnect = false
+    state.authExpiresAt = jsonResp.auth?.expiresAt ?? null
     const playlistResp = S.mask(
       jsonResp.playlists,
       SpotifyPaginatedResponse(SpotifyPlaylist)
@@ -81,6 +88,7 @@ app.on('get-playlists', async (state: State) => {
       JSON.stringify({
         allTracks: state.allTracks,
         status: state.status,
+        authExpiresAt: state.authExpiresAt,
       })
     )
   } catch (e) {

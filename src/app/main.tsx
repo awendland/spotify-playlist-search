@@ -50,6 +50,7 @@ const view = (state: State) => {
       <p>
         <em>{state.status}</em>
       </p>
+      {reconnectView(state)}
       <p>
         <a className={styles.refresh} onclick={() => app.run('refresh')}>
           Refresh
@@ -80,6 +81,25 @@ const view = (state: State) => {
       </div>
       {bodyView}
     </div>
+  )
+}
+
+// Prompt to reconnect this long before the Spotify authorization expires
+const RECONNECT_WARNING_MS = 14 * 24 * 60 * 60 * 1000
+
+const reconnectView = (state: State) => {
+  const msLeft = state.authExpiresAt
+    ? new Date(state.authExpiresAt).getTime() - Date.now()
+    : Infinity
+  if (!state.needsReconnect && msLeft > RECONNECT_WARNING_MS) return ''
+  const daysLeft = Math.max(0, Math.floor(msLeft / (24 * 60 * 60 * 1000)))
+  return (
+    <p>
+      {state.needsReconnect
+        ? ''
+        : `The Spotify connection expires in ${daysLeft} days. `}
+      <a href="/.netlify/functions/auth-login">Reconnect Spotify</a>
+    </p>
   )
 }
 

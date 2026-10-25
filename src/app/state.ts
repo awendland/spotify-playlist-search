@@ -18,4 +18,8 @@ export interface State {
   playlists?: Array<Infer<typeof SpotifyPlaylist>>
   status?: string
   filter?: string
+  // Set when the stored Spotify authorization has expired or is missing
+  needsReconnect?: boolean
+  // When the Spotify authorization expires (ISO date), if known
+  authExpiresAt?: string | null
 }

@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import { connectLambda } from '@netlify/blobs'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import * as S from 'superstruct'
 import {
@@ -6,6 +7,14 @@ import {
   SpotifyPlaylist,
   SpotifyTrack,
 } from './common/types'
+import {
+  REFRESH_TOKEN_LIFETIME_MS,
+  ReauthRequiredError,
+  StoredAuth,
+  clientAuthHeader,
+  readStoredAuth,
+  writeStoredAuth,
+} from './lib/spotify-auth'
 
 const searchParams = (params: Record<string, string>) =>
   Object.keys(params)
@@ -16,43 +25,57 @@ const searchParams = (params: Record<string, string>) =>
 
 let cachedAccessToken: { token: string; expiresAt: number } | null = null
 
-// SPOTIFY_REFRESH_TOKEN is a user-authorized token (see scripts/get-refresh-token.js)
-// so that private playlists are visible. Client credentials only see public ones.
-const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REFRESH_TOKEN } =
-  process.env
-;['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET', 'SPOTIFY_REFRESH_TOKEN'].forEach(
-  (secretKey) => {
-    if (!process.env[secretKey])
-      console.error(
-        `!!! Missing ${secretKey} in env: unable to communicate with Spotify API !!!`
-      )
-  }
-)
+;['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET'].forEach((secretKey) => {
+  if (!process.env[secretKey])
+    console.error(
+      `!!! Missing ${secretKey} in env: unable to communicate with Spotify API !!!`
+    )
+})
+
+// A user-authorized refresh token is needed so that private playlists are
+// visible (client credentials only see public ones). It's stored by the
+// auth-callback function, falling back to $SPOTIFY_REFRESH_TOKEN (from
+// scripts/get-refresh-token.js). authorizedAt is unknown for the fallback.
+async function getRefreshToken(): Promise<StoredAuth | null> {
+  const stored = await readStoredAuth()
+  if (stored) return stored
+  const { SPOTIFY_REFRESH_TOKEN } = process.env
+  return SPOTIFY_REFRESH_TOKEN
+    ? { refreshToken: SPOTIFY_REFRESH_TOKEN, authorizedAt: NaN }
+    : null
+}
 
 async function getAccessToken() {
   if (cachedAccessToken && cachedAccessToken.expiresAt > Date.now()) {
     return cachedAccessToken.token
   }
-  const spotifyAuthBlob = Buffer.from(
-    `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-  ).toString('base64')
+  const auth = await getRefreshToken()
+  if (!auth) throw new ReauthRequiredError('No refresh token')
   const resp = await fetch(`https://accounts.spotify.com/api/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-      Authorization: `Basic ${spotifyAuthBlob}`,
+      Authorization: clientAuthHeader(),
     },
     body: searchParams({
       grant_type: 'refresh_token',
-      refresh_token: SPOTIFY_REFRESH_TOKEN ?? '',
+      refresh_token: auth.refreshToken,
     }),
   })
   if (!resp.ok) {
-    throw new Error(
-      `Unable to refresh access token: ${resp.status} ${await resp.text()}`
-    )
+    const body = await resp.text()
+    // Spotify returns invalid_grant once the refresh token has expired
+    if (resp.status === 400 && body.includes('invalid_grant')) {
+      throw new ReauthRequiredError(`Refresh token rejected: ${body}`)
+    }
+    throw new Error(`Unable to refresh access token: ${resp.status} ${body}`)
   }
-  const { access_token, expires_in } = await resp.json()
+  const { access_token, expires_in, refresh_token } = await resp.json()
+  // Spotify may rotate the refresh token; keep the newest one (the 6 month
+  // lifetime still counts from the original authorization)
+  if (refresh_token && refresh_token !== auth.refreshToken) {
+    await writeStoredAuth({ ...auth, refreshToken: refresh_token })
+  }
   // Refresh a minute early so a token doesn't expire mid-request
   cachedAccessToken = {
     token: access_token,
@@ -125,10 +148,16 @@ async function mapWithConcurrency<T, R>(
   return results
 }
 
+const authExpiresAt = (auth: StoredAuth | null) =>
+  auth && Number.isFinite(auth.authorizedAt)
+    ? new Date(auth.authorizedAt + REFRESH_TOKEN_LIFETIME_MS).toISOString()
+    : null
+
 export const handler = async function (
   event: APIGatewayProxyEvent,
   context: any
 ) {
+  connectLambda(event as any)
   try {
     // 1. Retrieve all playlists owned by the authorized user (including
     // private ones). Followed playlists from other users are excluded.
@@ -175,10 +204,21 @@ export const handler = async function (
       body: JSON.stringify({
         playlists,
         tracks,
+        // Lets the page prompt the owner to reconnect before the token expires
+        auth: {
+          expiresAt: authExpiresAt(await getRefreshToken()),
+        },
       }),
     }
   } catch (err) {
     console.log(err) // output to netlify function log
+    if (err instanceof ReauthRequiredError) {
+      return {
+        statusCode: 401,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'reauth_required' }),
+      }
+    }
     return {
       statusCode: 500,
     }

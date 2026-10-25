@@ -32,6 +32,7 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
+    "@netlify/blobs": "^11",
     "apprun": "^2.23.1",
     "emotion": "^10.0.9",
     "node-fetch": "^2.3.0",

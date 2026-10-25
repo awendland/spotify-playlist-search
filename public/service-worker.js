@@ -14,8 +14,23 @@ self.addEventListener("install", event => {
   ))
 })
 
+// Take over from older service workers right away so fixes (like the auth
+// bypass below) apply without closing every tab
+self.addEventListener('install', () => self.skipWaiting())
+self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
+
 // Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
+  // Let the browser handle the Spotify sign-in redirects and any API calls
+  // that shouldn't be cached
+  const url = new URL(event.request.url)
+  if (
+    event.request.method !== 'GET' ||
+    url.origin !== self.location.origin ||
+    url.pathname.startsWith('/.netlify/functions/auth-')
+  ) {
+    return
+  }
   // Open the cache
   event.respondWith(caches.open(cacheName).then((cache) => {
     // Go to the network first
