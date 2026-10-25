@@ -170,7 +170,7 @@ export const handler = async function (
         'Content-Type': 'application/json',
         // Cache on Netlify's CDN so repeat page loads don't hit Spotify's rate limit
         'Netlify-CDN-Cache-Control':
-          'public, s-maxage=300, stale-while-revalidate=3600',
+          'public, durable, s-maxage=300, stale-while-revalidate=3600',
       },
       body: JSON.stringify({
         playlists,
