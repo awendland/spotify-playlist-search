@@ -56,9 +56,10 @@ export const handler = async function (event: APIGatewayProxyEvent) {
       headers: { Authorization: `Bearer ${access_token}` },
     }).then((r) => r.json())
     if (me.id !== SPOTIFY_USER) {
+      const signedInAs = String(me.id).replace(/[^\w.-]/g, '')
       return page(
         403,
-        `Signed in as "${me.id}", but this site only accepts ${SPOTIFY_USER}.`
+        `Signed in as "${signedInAs}", but this site only accepts ${SPOTIFY_USER}.`
       )
     }
 

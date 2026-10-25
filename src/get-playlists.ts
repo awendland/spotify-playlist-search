@@ -45,10 +45,21 @@ async function getRefreshToken(): Promise<StoredAuth | null> {
     : null
 }
 
+// Share one in-flight refresh between concurrent requests, so a rotated
+// refresh token isn't used twice
+let pendingAccessToken: Promise<string> | null = null
+
 async function getAccessToken() {
   if (cachedAccessToken && cachedAccessToken.expiresAt > Date.now()) {
     return cachedAccessToken.token
   }
+  pendingAccessToken ??= refreshAccessToken().finally(() => {
+    pendingAccessToken = null
+  })
+  return pendingAccessToken
+}
+
+async function refreshAccessToken() {
   const auth = await getRefreshToken()
   if (!auth) throw new ReauthRequiredError('No refresh token')
   const resp = await fetch(`https://accounts.spotify.com/api/token`, {
@@ -137,11 +148,19 @@ async function mapWithConcurrency<T, R>(
 ) {
   const results: Array<R> = new Array(items.length)
   let nextIndex = 0
+  let failed = false
   await Promise.all(
     Array.from({ length: concurrency }, async () => {
-      while (nextIndex < items.length) {
+      // Stop starting new work once anything fails, rather than making
+      // requests whose results will be thrown away
+      while (!failed && nextIndex < items.length) {
         const i = nextIndex++
-        results[i] = await fn(items[i])
+        try {
+          results[i] = await fn(items[i])
+        } catch (err) {
+          failed = true
+          throw err
+        }
       }
     })
   )

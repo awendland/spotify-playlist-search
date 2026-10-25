@@ -28,6 +28,9 @@ app.on('get-playlists', async (state: State) => {
       app.run('render', state)
       return
     }
+    if (!resp.ok) {
+      throw new Error(`Loading playlists failed (${resp.status})`)
+    }
     const jsonResp = await resp.json()
     state.needsReconnect = false
     state.authExpiresAt = jsonResp.auth?.expiresAt ?? null
