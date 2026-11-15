@@ -61,6 +61,10 @@ const view = (state: State) => {
           disabled={!state.allTracks}
           oninput={(ev) => app.run('filter', ev.target.value)}
           placeholder="Search tracks"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
           className={styles.input}
           ref={(el: HTMLInputElement) => {
             inputEl = el
