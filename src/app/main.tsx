@@ -62,12 +62,14 @@ const view = (state: State) => {
           oninput={(ev) => app.run('filter', ev.target.value)}
           placeholder="Search tracks"
           autocomplete="off"
-          autocorrect="off"
           autocapitalize="off"
-          spellcheck="false"
           className={styles.input}
           ref={(el: HTMLInputElement) => {
             inputEl = el
+            // AppRun assigns these as DOM properties, where the strings "off"/"false"
+            // coerce to `true` (since both are boolean properties), so set the attributes directly.
+            el.setAttribute('autocorrect', 'off')
+            el.setAttribute('spellcheck', 'false')
           }}
         />
         <button
